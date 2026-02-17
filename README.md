@@ -160,6 +160,49 @@ curl --fail -u 'admin:admin' 'http://localhost:8080/scm/api/v2/me/password' \
   --data-raw '{"oldPassword":"admin","newPassword":"'"$NEW_PASSWORD"'"}'
 ```
 
+## Cert-Manager
+
+TODO
+* how to handle ingress and DNS entry coming late to the party without getting rate-limited by Let's Encrypt?
+* either delete `ecosystem-certificate` secret or make certmanager write certificate into different secret and change it in LOP after secret is created
+* Quality of live
+  * GOP: CertManager should be multi source app so we can deploy Issuers with it
+  * SCMM Chart: implement `tls: true` without redundant `hostname`
+
+```bash
+  scm:
+    scmManager:
+      helm:
+        values:
+          ingress:
+            ingressClassName: k8s-ecosystem-ces-service
+            tls: 
+            - secretName: scm-manager-tls
+              hosts:
+              - scmm.example.com
+            annotations: 
+              cert-manager.io/cluster-issuer: "letsencrypt-prod"
+  features:
+    # TODO enable cert-manager
+    argocd:
+      active: true
+      values:
+        argo-cd:
+          server:
+            ingress:
+              ingressClassName: "k8s-ecosystem-ces-service"
+              tls: true 
+              annotations: 
+                cert-manager.io/cluster-issuer: "letsencrypt-prod"
+  content:
+# TODO add content repo that copies optional feature from feature folder 
+    repos:
+      - url: https://github.com/cloudogu/gop-deploy-lop-example
+        path: repos
+        templating: true
+        type: COPY
+        overwriteMode: UPGRADE
+```
 
 ## See also
 * https://github.com/cloudogu/ecosystem-core/blob/develop/docs/operations/argoCD_en.md

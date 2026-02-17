@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: blueprint
+  name: lop-resources
   namespace: argocd
   annotations:
     argocd.argoproj.io/sync-wave: "1"
@@ -10,7 +10,7 @@ metadata:
 spec:
   project: cluster-resources
   source:
-    path: apps/blueprint/
+    path: apps/lop-resources/
     repoURL: ${scm.repoUrl}argocd/cluster-resources.git
     targetRevision: main
     directory:
