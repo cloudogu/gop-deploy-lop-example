@@ -12,7 +12,7 @@ spec:
   source:
     repoURL: registry.cloudogu.com/k8s
     chart: ecosystem-core
-    targetRevision: "3.0.0"
+    targetRevision: "3.0.2"
     path: "."  # required for Helm OCI sources
     helm:
       valuesObject:

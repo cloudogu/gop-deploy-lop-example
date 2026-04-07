@@ -22,8 +22,9 @@ If you are running Ubuntu you might have to do the following to avoid crashes of
   DOGU_REGISTRY_USERNAME='xzy' # or robot$...
   DOGU_REGISTRY_PASSWORD=''
 NAMESPACE=ecosystem
-GOP_VERSION='c076ee11' # 0.15.0 preview
+GOP_VERSION='0.16.0'
 GOP_CHART_VERSION='0.4.0'
+SNAPSHOTTER_VERSION='v8.5.0'
 CONTEXT=k3d-gitops-playground
 
 # Start k3d 
@@ -31,9 +32,9 @@ bash <(curl -s \
   https://raw.githubusercontent.com/cloudogu/gitops-playground/$GOP_VERSION/scripts/init-cluster.sh) --bind-ports=443:443
 
 # For velero
-kubectl apply -f https://raw.githubusercontent.com/kubernetes-csi/external-snapshotter/v6.2.1/client/config/crd/snapshot.storage.k8s.io_volumesnapshotclasses.yaml --context "$CONTEXT" 
-kubectl apply -f https://raw.githubusercontent.com/kubernetes-csi/external-snapshotter/v6.2.1/client/config/crd/snapshot.storage.k8s.io_volumesnapshotcontents.yaml --context "$CONTEXT" 
-kubectl apply -f https://raw.githubusercontent.com/kubernetes-csi/external-snapshotter/v6.2.1/client/config/crd/snapshot.storage.k8s.io_volumesnapshots.yaml --context "$CONTEXT" 
+kubectl apply -f https://raw.githubusercontent.com/kubernetes-csi/external-snapshotter/$SNAPSHOTTER_VERSION/client/config/crd/snapshot.storage.k8s.io_volumesnapshotclasses.yaml --context "$CONTEXT" 
+kubectl apply -f https://raw.githubusercontent.com/kubernetes-csi/external-snapshotter/$SNAPSHOTTER_VERSION/client/config/crd/snapshot.storage.k8s.io_volumesnapshotcontents.yaml --context "$CONTEXT" 
+kubectl apply -f https://raw.githubusercontent.com/kubernetes-csi/external-snapshotter/$SNAPSHOTTER_VERSION/client/config/crd/snapshot.storage.k8s.io_volumesnapshots.yaml --context "$CONTEXT" 
 
 k create ns $NAMESPACE --context "$CONTEXT" 
 k create ns argocd --context "$CONTEXT" 
@@ -91,7 +92,6 @@ config:
   scm:
     scmManager:
       helm:
-        version: "3.11.3" # TODO remove once updated in GOP
         values:
           ingress:
             ingressClassName: k8s-ecosystem-ces-service
@@ -110,8 +110,8 @@ config:
         templating: true
         type: FOLDER_BASED
         overwriteMode: UPGRADE
-#    variables:
-#      fqdn: lop.example.com
+    variables:
+      fqdn: $(docker inspect k3d-gitops-playground-serverlb --format='{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}')
 EOF
 ```
 
